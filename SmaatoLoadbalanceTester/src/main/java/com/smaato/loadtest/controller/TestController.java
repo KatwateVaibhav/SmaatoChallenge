@@ -10,9 +10,14 @@ public class TestController {
 	@Autowired
 	private RestTemplate template;
 
-	@GetMapping("/balancerTest")
-	public String invokePaymentService() {
+	@GetMapping("/postApi")
+	public String invokePostApiInstance() {
 		return template.getForObject("http://Smaato-Challenge/api/smaato/accept?id=54&url=http://Smaato-Challenge/api/smaato/addRequestCount", String.class);
+	}
+	
+	@GetMapping("/getApi")
+	public String invokeGetApi() {
+		return template.getForObject("http://Smaato-Challenge/api/smaato/accept?id=54&url=http://Smaato-Challenge/api/smaato/accept?id=5", String.class);
 	}
 
 }

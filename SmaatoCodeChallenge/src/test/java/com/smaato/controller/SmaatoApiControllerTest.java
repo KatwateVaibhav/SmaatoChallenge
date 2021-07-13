@@ -67,4 +67,14 @@ class SmaatoApiControllerTest {
     	ResponseEntity<String> responseEntity = restTemplate.getForEntity(getUrl, String.class);
     	assertEquals("ok", "ok");
     }
+	
+	@Test
+	void acceptIdWithGetRequest() throws Exception {
+		
+		uri = UriComponentsBuilder.fromHttpUrl(getUrl).queryParam("id", 12).queryParam("url","http://localhost:" + port +"api/smaato/accept?id=5").build().toUri();
+		ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
+		assertEquals(HttpStatus.OK.value(), responseEntity.getStatusCodeValue());
+
+	}
+
 }

@@ -35,33 +35,39 @@ public class HttpClientServiceImpl implements HttpClientService {
 	UriComponentsBuilder httpUrl;
 	URI uri;
 
+	
+	/** Method is used for sending http request for POST and GET method via RestTemplate **/
 	@Async
 	@Override
 	public void sendHttpRequest(String strUri) {
-		if (!strUri.isEmpty() && strUri.contains("/addRequestCount")) {
-			try {
+		try {
+			if (!strUri.isEmpty() && strUri.contains("/addRequestCount")) {
+
 				httpUrl = UriComponentsBuilder.fromHttpUrl(strUri);
 				uri = httpUrl.queryParam("reqCount", requestIds.size()).build().toUri();
 				ResponseEntity<String> result = restTemplate.exchange(uri, HttpMethod.POST, null, String.class);
-				logger.info("Status code for post endpoint {} for {} is {}", strUri, requestIds.size(),result.getStatusCode());
-			} catch (HttpClientErrorException exception) {
-				logger.info("Status code from the endpoint {} is {}", strUri, exception.getStatusCode().value());
+				logger.info("Status code for post endpoint {} for {} is {}", strUri, requestIds.size(),
+						result.getStatusCode());
+
+			} else {
+				uri = UriComponentsBuilder.fromHttpUrl(strUri).build().encode().toUri();
+				ResponseEntity<String> result = restTemplate.exchange(uri, HttpMethod.GET, null, String.class);
+				logger.info("Status code for Get the endpoint {} is {}", strUri, result.getStatusCode());
 			}
-		} else {
-			uri = UriComponentsBuilder.fromHttpUrl(strUri).build().encode().toUri();
-			ResponseEntity<String> result = restTemplate.exchange(uri, HttpMethod.GET, null, String.class);
-			logger.info("Status code from the endpoint {} is {}", strUri, result.getStatusCode());
+		} catch (HttpClientErrorException exception) {
+			logger.info("Status code for exception the endpoint {} is {}", strUri, exception.getStatusCode().value());
 		}
-		
+
 	}
 
-	
+	/** We are saving number of request in Set to maintain unique requestset **/
 	@Async
 	@Override
 	public void saveId(Long id) {
 		CompletableFuture.completedFuture(requestIds.add(id));
 	}
 	
+	/** Method used to print request we receive every 1 minute **/
 	@Scheduled(cron = "0 * * ? * *")
 	@Override
 	public void logDetails() {
